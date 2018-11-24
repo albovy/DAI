@@ -18,13 +18,13 @@ import java.util.Map;
 import java.util.Properties;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.TimeUnit;
 
 
 public class HybridServer {
     private int service_port = 8888;
     private Thread serverThread;
     private boolean stop;
-    private Map<String, String> pages;
     private ExecutorService threadPool;
     private Properties properties;
 
@@ -51,9 +51,7 @@ public class HybridServer {
 
     }
 
-    public void setServicePort(int servicePort) {
-        this.service_port = servicePort;
-    }
+
 
     public HybridServer(Map<String, String> pages) {
         this.threadPool = Executors.newFixedThreadPool(50);
@@ -76,6 +74,9 @@ public class HybridServer {
 
     public int getPort() {
         return service_port;
+    }
+    public void setServicePort(int servicePort) {
+        this.service_port = servicePort;
     }
 
     public void start() {
@@ -111,5 +112,12 @@ public class HybridServer {
         }
 
         this.serverThread = null;
+        threadPool.shutdownNow();
+
+        try {
+            threadPool.awaitTermination(Long.MAX_VALUE, TimeUnit.DAYS);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
     }
 }

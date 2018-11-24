@@ -38,7 +38,7 @@ public class ServiceThread implements Runnable {
 
             if (request.getMethod().equals(HTTPRequestMethod.GET)) {
                 if (request.getResourceName().isEmpty()) {
-                    response.setContent("<html><body>Hybrid Server</body></html>");
+                    response.setContent("<html><body>Hybrid Server</body> Autores : Alejandro Borrajo Viéitez, Iván Sánchez Fernández</html>");
                     response.setStatus(HTTPResponseStatus.S200);
                     response.setVersion(HTTPHeaders.HTTP_1_1.getHeader());
                 } else {
@@ -68,16 +68,14 @@ public class ServiceThread implements Runnable {
                                 StringBuilder listadoHtml = new StringBuilder();
                                 Set<String> keys = controller.listPages();
                                 for (String itUuid : keys) {
-                                    listadoHtml.append("<a href=\"http:/");
-                                    listadoHtml.append("localhost:" + socket.getLocalAddress() + "/");
-
-                                    listadoHtml.append(resourceName);
+                                    listadoHtml.append("<a href=\"");
                                     listadoHtml.append("?uuid=");
                                     listadoHtml.append(itUuid);
                                     listadoHtml.append("\">");
                                     listadoHtml.append(itUuid);
                                     listadoHtml.append("</a>");
-                                    listadoHtml.append("\n");
+                                    listadoHtml.append("<br>");
+
 
 
                                 }
