@@ -1,6 +1,8 @@
 package es.uvigo.esei.dai.hybridserver.dao;
 
 
+import es.uvigo.esei.dai.hybridserver.Configuration;
+
 import javax.xml.transform.Result;
 import java.sql.*;
 import java.util.HashSet;
@@ -8,17 +10,17 @@ import java.util.Properties;
 import java.util.Set;
 
 
-public class ServiceDBDAO implements ServiceDAO {
-    private String urlDB;
-    private Properties userPass;
+public class ServiceDBDAOHTML implements ServiceDAO {
 
-    public ServiceDBDAO(String urlDB, Properties userPass){
-       this.urlDB = urlDB;
-       this.userPass  = userPass;
+    private Configuration conf;
+
+
+    public ServiceDBDAOHTML(Configuration conf){
+        this.conf = conf;
     }
     @Override
     public void createPage(String uuid,String content) {
-        try (Connection connection = DriverManager.getConnection(this.urlDB,this.userPass)){
+        try (Connection connection = DriverManager.getConnection(this.conf.getDbURL(),this.conf.getDbUser(),this.conf.getDbPassword())){
             String query = "INSERT INTO HTML(uuid,content) " + "VALUES(?,?)";
             try(PreparedStatement statement = connection.prepareStatement(query)){
                 statement.setString(1,uuid);
@@ -40,7 +42,7 @@ public class ServiceDBDAO implements ServiceDAO {
     @Override
     public String getPage(String uuid) {
         String content = null;
-        try(Connection connection =  DriverManager.getConnection(this.urlDB,this.userPass)){
+        try(Connection connection =  DriverManager.getConnection(this.conf.getDbURL(),this.conf.getDbUser(),this.conf.getDbPassword())){
             String query = "SELECT * FROM HTML WHERE uuid = ?";
             try(PreparedStatement statement = connection.prepareStatement(query)) {
                     statement.setString(1,uuid);
@@ -58,7 +60,7 @@ public class ServiceDBDAO implements ServiceDAO {
 
     @Override
     public void deletePage(String uuid) {
-        try(Connection connection = DriverManager.getConnection(this.urlDB,this.userPass)){
+        try(Connection connection = DriverManager.getConnection(this.conf.getDbURL(),this.conf.getDbUser(),this.conf.getDbPassword())){
             String query = "DELETE FROM HTML WHERE uuid = ?";
             try(PreparedStatement statement = connection.prepareStatement(query)){
                 statement.setString(1,uuid);
@@ -77,7 +79,7 @@ public class ServiceDBDAO implements ServiceDAO {
     @Override
     public Set<String> listPages() {
         Set<String> pages = new HashSet<>();
-        try(Connection connection = DriverManager.getConnection(this.urlDB,this.userPass)){
+        try(Connection connection = DriverManager.getConnection(this.conf.getDbURL(),this.conf.getDbUser(),this.conf.getDbPassword())){
 
             String query = "SELECT * FROM HTML";
             try(Statement statement = connection.createStatement()){

@@ -2,18 +2,14 @@ package es.uvigo.esei.dai.hybridserver;
 
 import es.uvigo.esei.dai.hybridserver.controller.DefaultServiceController;
 import es.uvigo.esei.dai.hybridserver.controller.ServiceController;
-import es.uvigo.esei.dai.hybridserver.dao.ServiceDAO;
-import es.uvigo.esei.dai.hybridserver.dao.ServiceDBDAO;
-import es.uvigo.esei.dai.hybridserver.dao.ServiceMapDAO;
-import org.apache.derby.iapi.sql.conn.ConnectionUtil;
+import es.uvigo.esei.dai.hybridserver.controller.ServiceControllerForXslt;
+import es.uvigo.esei.dai.hybridserver.controller.ServiceControllerXslt;
+import es.uvigo.esei.dai.hybridserver.dao.*;
 
 
 import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
-import java.sql.Connection;
-import java.sql.DriverManager;
-import java.sql.SQLException;
 import java.util.Map;
 import java.util.Properties;
 import java.util.concurrent.ExecutorService;
@@ -26,28 +22,35 @@ public class HybridServer {
     private Thread serverThread;
     private boolean stop;
     private ExecutorService threadPool;
-    private Properties properties;
 
-    final ServiceDAO dao;
-    final ServiceController controller;
+
+    private ServiceDAO daoHTML;
+    private ServiceDAO daoXML;
+    private ServiceDAO daoXSD;
+    private ServiceDAOForXslt daoXSLT;
+    private ServiceController controllerHTML;
+    private ServiceController controllerXML;
+    private ServiceController controllerXSD;
+    private ServiceControllerForXslt controllerXSLT;
 
 
 
     public HybridServer() {
-        Properties propertiesUserPass= new Properties();
-        this.properties = new Properties();
-        this.threadPool = Executors.newFixedThreadPool(50);
-        this.properties.put("port",Integer.toString(getPort()));
-        this.properties.put("db.url","jdbc:mysql://localhost:3306/hstestdb");
-        this.properties.put("db.user","hsdb");
-        propertiesUserPass.put("user","hsdb");
-        this.properties.put("db.password","hsdbpass");
-        propertiesUserPass.put("password","hsdbpass");
-
+        Configuration conf = new Configuration();
+        this.threadPool = Executors.newFixedThreadPool(conf.getNumClients());
 
         //dao = new ServiceMapDAO();
-        this.dao = new ServiceDBDAO(properties.getProperty("db.url"),propertiesUserPass);
-        this.controller = new DefaultServiceController(dao);
+        this.daoHTML = new ServiceDBDAOHTML(conf);
+        this.controllerHTML = new DefaultServiceController(daoHTML);
+        this.daoXML = new ServiceDBDAOXML(conf);
+        this.controllerXML = new DefaultServiceController(daoXML);
+        this.daoXSD = new ServiceDBDAOXSD(conf);
+        this.controllerXSD = new DefaultServiceController(daoXSD);
+        this.daoXSLT = new ServiceDBDADOXSLT(conf);
+        this.controllerXSLT = new ServiceControllerXslt(daoXSLT);
+
+
+
 
     }
 
@@ -55,19 +58,42 @@ public class HybridServer {
 
     public HybridServer(Map<String, String> pages) {
         this.threadPool = Executors.newFixedThreadPool(50);
-        this.dao = new ServiceMapDAO(pages);
-        this.controller = new DefaultServiceController(dao);
+        this.daoHTML = new ServiceMapDAO(pages);
+        this.controllerHTML = new DefaultServiceController(daoHTML);
+
+    }
+    public HybridServer(Configuration configuration) {
+        this.threadPool = Executors.newFixedThreadPool(configuration.getNumClients());
+        this.service_port = configuration.getHttpPort();
+        this.daoHTML = new ServiceDBDAOHTML(configuration);
+        this.controllerHTML = new DefaultServiceController(daoHTML);
+        this.daoXML = new ServiceDBDAOXML(configuration);
+        this.controllerXML = new DefaultServiceController(daoXML);
+        this.daoXSD = new ServiceDBDAOXSD(configuration);
+        this.controllerXSD = new DefaultServiceController(daoXSD);
+        this.daoXSLT = new ServiceDBDADOXSLT(configuration);
+        this.controllerXSLT = new ServiceControllerXslt(daoXSLT);
 
     }
 
     public HybridServer(Properties properties) {
-        Properties propertiesUserPass= new Properties();
-        this.properties = properties;
+        Configuration conf = new Configuration();
+        conf.setNumClients(Integer.parseInt(properties.getProperty("numClients")));
+        conf.setHttpPort(Integer.parseInt(properties.getProperty("port")));
+        conf.setDbUser(properties.getProperty("db.user"));
+        conf.setDbPassword(properties.getProperty("db.password"));
+        conf.setDbURL(properties.getProperty("db.url"));
         this.threadPool = Executors.newFixedThreadPool(Integer.parseInt(properties.getProperty("numClients")));
-        propertiesUserPass.put("user",properties.getProperty("db.user"));
-        propertiesUserPass.put("password",properties.getProperty("db.password"));
-        this.dao = new ServiceDBDAO(properties.getProperty("db.url"),propertiesUserPass);
-        this.controller = new DefaultServiceController(dao);
+
+        this.daoHTML = new ServiceDBDAOHTML(conf);
+        this.controllerHTML = new DefaultServiceController(daoHTML);
+        this.daoXML = new ServiceDBDAOXML(conf);
+        this.controllerXML = new DefaultServiceController(daoXML);
+        this.daoXSD = new ServiceDBDAOXSD(conf);
+        this.controllerXSD = new DefaultServiceController(daoXSD);
+        this.daoXSLT = new ServiceDBDADOXSLT(conf);
+        this.controllerXSLT = new ServiceControllerXslt(daoXSLT);
+
         this.setServicePort(Integer.parseInt(properties.getProperty("port")));
 
     }
@@ -85,7 +111,7 @@ public class HybridServer {
                 while (true) {
                     Socket clientSocket = serverSocket.accept();
                     if (stop) break;
-                    threadPool.execute(new ServiceThread(clientSocket,controller));
+                    threadPool.execute(new ServiceThread(clientSocket, controllerHTML, controllerXML, controllerXSD, controllerXSLT));
                 }
             } catch (IOException e) {
                 e.printStackTrace();

@@ -1,0 +1,48 @@
+<xs:schema attributeFormDefault="unqualified"
+           elementFormDefault="qualified"
+           targetNamespace="http://www.esei.uvigo.es/dai/hybridserver"
+           xmlns:xs="http://www.w3.org/2001/XMLSchema">
+    <xs:element name="configuration">
+        <xs:complexType>
+            <xs:sequence>
+                <xs:element name="connections">
+                    <xs:complexType>
+                        <xs:sequence>
+                            <xs:element type="xs:short" name="http"/>
+                            <xs:element type="xs:anyURI" name="webservice"/>
+                            <xs:element type="xs:byte" name="numClients"/>
+                        </xs:sequence>
+                    </xs:complexType>
+                </xs:element>
+                <xs:element name="database">
+                    <xs:complexType>
+                        <xs:sequence>
+                            <xs:element type="xs:string" name="user"/>
+                            <xs:element type="xs:string" name="password"/>
+                            <xs:element type="xs:string" name="url"/>
+                        </xs:sequence>
+                    </xs:complexType>
+                </xs:element>
+                <xs:element name="servers">
+                    <xs:complexType>
+                        <xs:sequence>
+                            <xs:element name="server" maxOccurs="unbounded" minOccurs="0">
+                                <xs:complexType>
+                                    <xs:simpleContent>
+                                        <xs:extension base="xs:string">
+                                            <xs:attribute type="xs:string" name="name" use="optional"/>
+                                            <xs:attribute type="xs:anyURI" name="wsdl" use="optional"/>
+                                            <xs:attribute type="xs:anyURI" name="namespace" use="optional"/>
+                                            <xs:attribute type="xs:string" name="service" use="optional"/>
+                                            <xs:attribute type="xs:anyURI" name="httpAddress" use="optional"/>
+                                        </xs:extension>
+                                    </xs:simpleContent>
+                                </xs:complexType>
+                            </xs:element>
+                        </xs:sequence>
+                    </xs:complexType>
+                </xs:element>
+            </xs:sequence>
+        </xs:complexType>
+    </xs:element>
+</xs:schema>
