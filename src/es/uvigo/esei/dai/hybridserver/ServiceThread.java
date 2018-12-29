@@ -96,7 +96,7 @@ public class ServiceThread implements Runnable {
 
                                                         response.setStatus(HTTPResponseStatus.S200);
                                                     }else{
-
+                                                        System.out.println("este");
                                                         response.setStatus(HTTPResponseStatus.S400);
                                                     }
 
