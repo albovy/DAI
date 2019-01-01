@@ -141,7 +141,7 @@ extends JdbcTestCase {
 			final String uuid = page[0];
 			final String xslt = page[2]; // El XML no es válido para el XSD
 			final String uuidPageURL = pageURL + "?uuid=" + uuid + "&xslt=" + xslt;
-			System.out.println(uuidPageURL);
+
 			assertThat(getStatus(uuidPageURL), is(equalTo(400)));
 		}
 	}

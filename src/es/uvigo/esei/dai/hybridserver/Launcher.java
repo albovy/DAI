@@ -17,7 +17,6 @@ public class Launcher {
                     System.exit(0);
                 }
             } else {
-                System.err.println("Arguments can just be one.");
                 System.exit(0);
             }
         } else {

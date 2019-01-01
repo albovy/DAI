@@ -18,6 +18,8 @@ public class ServiceDBDAOHTML implements ServiceDAO {
     public ServiceDBDAOHTML(Configuration conf){
         this.conf = conf;
     }
+
+
     @Override
     public void createPage(String uuid,String content) {
         try (Connection connection = DriverManager.getConnection(this.conf.getDbURL(),this.conf.getDbUser(),this.conf.getDbPassword())){

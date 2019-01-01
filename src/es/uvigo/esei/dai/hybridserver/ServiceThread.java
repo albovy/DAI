@@ -78,17 +78,16 @@ public class ServiceThread implements Runnable {
 
                                             if(uuidXSLT!=null){
                                                 String uuidXSD = controllerXSLT.getXSD(uuidXSLT);
-                                                System.out.println(uuidXSLT);
+
 
                                                 String contentXSLT = controllerXSLT.getPage(uuidXSLT);
 
                                                 if(uuidXSD != null){
-                                                    System.out.println(uuidXSD);
+
                                                     String contentXSD = controllerXSD.getPage(uuidXSD);
                                                     String contentXML = controllerXML.getPage(uuid);
-                                                    System.out.println(contentXSD);
-                                                    System.out.println(contentXSLT);
-                                                    if(validateXMLSchema(contentXSD,contentXSLT)){
+
+                                                    if(validateXMLSchema(contentXSD,contentXML)){
                                                         MIME html = MIME.TEXT_HTML;
                                                         String contenidoTransform = transform(contentXSLT, contentXML);
                                                         response.setContent(contenidoTransform);
@@ -96,7 +95,7 @@ public class ServiceThread implements Runnable {
 
                                                         response.setStatus(HTTPResponseStatus.S200);
                                                     }else{
-                                                        System.out.println("este");
+
                                                         response.setStatus(HTTPResponseStatus.S400);
                                                     }
 

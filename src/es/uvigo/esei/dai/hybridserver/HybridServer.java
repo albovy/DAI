@@ -7,6 +7,7 @@ import es.uvigo.esei.dai.hybridserver.controller.ServiceControllerXslt;
 import es.uvigo.esei.dai.hybridserver.dao.*;
 
 
+import javax.xml.ws.Endpoint;
 import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
@@ -32,12 +33,16 @@ public class HybridServer {
     private ServiceController controllerXML;
     private ServiceController controllerXSD;
     private ServiceControllerForXslt controllerXSLT;
+    private Configuration conf;
+    private String url;
+    private Endpoint endpoint;
 
 
 
     public HybridServer() {
-        Configuration conf = new Configuration();
+        conf = new Configuration();
         this.threadPool = Executors.newFixedThreadPool(conf.getNumClients());
+        service_port = conf.getHttpPort();
 
         //dao = new ServiceMapDAO();
         this.daoHTML = new ServiceDBDAOHTML(conf);
@@ -73,16 +78,19 @@ public class HybridServer {
         this.controllerXSD = new DefaultServiceController(daoXSD);
         this.daoXSLT = new ServiceDBDADOXSLT(configuration);
         this.controllerXSLT = new ServiceControllerXslt(daoXSLT);
+        this.url = configuration.getWebServiceURL();
+        this.conf = configuration;
+
 
     }
 
     public HybridServer(Properties properties) {
-        Configuration conf = new Configuration();
-        conf.setNumClients(Integer.parseInt(properties.getProperty("numClients")));
-        conf.setHttpPort(Integer.parseInt(properties.getProperty("port")));
-        conf.setDbUser(properties.getProperty("db.user"));
-        conf.setDbPassword(properties.getProperty("db.password"));
-        conf.setDbURL(properties.getProperty("db.url"));
+        this.conf = new Configuration();
+        this.conf.setNumClients(Integer.parseInt(properties.getProperty("numClients")));
+        this.conf.setHttpPort(Integer.parseInt(properties.getProperty("port")));
+        this.conf.setDbUser(properties.getProperty("db.user"));
+        this.conf.setDbPassword(properties.getProperty("db.password"));
+        this.conf.setDbURL(properties.getProperty("db.url"));
         this.threadPool = Executors.newFixedThreadPool(Integer.parseInt(properties.getProperty("numClients")));
 
         this.daoHTML = new ServiceDBDAOHTML(conf);
@@ -106,6 +114,9 @@ public class HybridServer {
     }
 
     public void start() {
+        if(this.url != null){
+            this.endpoint = Endpoint.publish(url,new WebServiceImpl(this.conf));
+        }
         this.serverThread = new Thread(() -> {
             try (final ServerSocket serverSocket = new ServerSocket(getPort())) {
                 while (true) {
@@ -124,6 +135,9 @@ public class HybridServer {
 
     public void stop() {
         this.stop = true;
+        if(endpoint != null){
+            this.endpoint.stop();
+        }
 
         try (Socket socket = new Socket("localhost", getPort())) {
             // Esta conexión se hace, simplemente, para "despertar" el hilo servidor
