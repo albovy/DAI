@@ -1,9 +1,9 @@
 package es.uvigo.esei.dai.hybridserver;
 
-import es.uvigo.esei.dai.hybridserver.controller.DefaultServiceController;
-import es.uvigo.esei.dai.hybridserver.controller.ServiceController;
-import es.uvigo.esei.dai.hybridserver.controller.ServiceControllerForXslt;
-import es.uvigo.esei.dai.hybridserver.controller.ServiceControllerXslt;
+import es.uvigo.esei.dai.hybridserver.Provider.HTMLPageProviderFactory;
+import es.uvigo.esei.dai.hybridserver.Provider.PageProvider;
+import es.uvigo.esei.dai.hybridserver.Provider.PageProviderFactory;
+import es.uvigo.esei.dai.hybridserver.controller.*;
 import es.uvigo.esei.dai.hybridserver.dao.*;
 
 
@@ -28,6 +28,8 @@ public class HybridServer {
     private ServiceDAO daoHTML;
     private ServiceDAO daoXML;
     private ServiceDAO daoXSD;
+    private PageProviderFactory providerFactory;
+    private PageProvider HTMLProvider;
     private ServiceDAOForXslt daoXSLT;
     private ServiceController controllerHTML;
     private ServiceController controllerXML;
@@ -36,17 +38,21 @@ public class HybridServer {
     private Configuration conf;
     private String url;
     private Endpoint endpoint;
+    private RemoteServers remote;
 
 
 
     public HybridServer() {
         conf = new Configuration();
+        this.providerFactory = new PageProviderFactory(conf);
+        this.HTMLProvider = providerFactory.createHTMLProvider();
         this.threadPool = Executors.newFixedThreadPool(conf.getNumClients());
         service_port = conf.getHttpPort();
 
         //dao = new ServiceMapDAO();
+
         this.daoHTML = new ServiceDBDAOHTML(conf);
-        this.controllerHTML = new DefaultServiceController(daoHTML);
+        this.controllerHTML = new DefaultServiceController(daoHTML,HTMLProvider);
         this.daoXML = new ServiceDBDAOXML(conf);
         this.controllerXML = new DefaultServiceController(daoXML);
         this.daoXSD = new ServiceDBDAOXSD(conf);
