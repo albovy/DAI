@@ -12,11 +12,18 @@ public class PageProviderFactory {
         this.remote = new RemoteServers(conf);
     }
 
-    public HTMLPageProviderFactory createHTMLProvider(){
-        return new HTMLPageProviderFactory(remote);
+    public HTMLPageProvider createHTMLProvider(){
+        return new HTMLPageProvider(remote);
     }
 
-    public XMLPageProviderFactory createXMLProvider(){
-        return new XMLPageProviderFactory(remote);
+    public XMLPageProvider createXMLProvider(){
+        return new XMLPageProvider(remote);
+    }
+
+    public XSDPageProvider createXSDProvider(){
+        return new XSDPageProvider(remote);
+    }
+    public XSLTPageProvider createXSLTProvider(){
+        return new XSLTPageProvider(remote);
     }
 }

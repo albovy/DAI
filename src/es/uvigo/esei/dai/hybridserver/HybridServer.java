@@ -1,6 +1,5 @@
 package es.uvigo.esei.dai.hybridserver;
 
-import es.uvigo.esei.dai.hybridserver.Provider.HTMLPageProviderFactory;
 import es.uvigo.esei.dai.hybridserver.Provider.PageProvider;
 import es.uvigo.esei.dai.hybridserver.Provider.PageProviderFactory;
 import es.uvigo.esei.dai.hybridserver.controller.*;
@@ -30,6 +29,9 @@ public class HybridServer {
     private ServiceDAO daoXSD;
     private PageProviderFactory providerFactory;
     private PageProvider HTMLProvider;
+    private PageProvider XMLProvider;
+    private PageProvider XSDProvider;
+    private PageProvider XSLTProvider;
     private ServiceDAOForXslt daoXSLT;
     private ServiceController controllerHTML;
     private ServiceController controllerXML;
@@ -44,21 +46,25 @@ public class HybridServer {
 
     public HybridServer() {
         conf = new Configuration();
-        this.providerFactory = new PageProviderFactory(conf);
-        this.HTMLProvider = providerFactory.createHTMLProvider();
+
         this.threadPool = Executors.newFixedThreadPool(conf.getNumClients());
         service_port = conf.getHttpPort();
 
         //dao = new ServiceMapDAO();
+        this.providerFactory = new PageProviderFactory(conf);
+        this.HTMLProvider = providerFactory.createHTMLProvider();
+        this.XMLProvider = providerFactory.createXMLProvider();
+        this.XSDProvider = providerFactory.createXSDProvider();
+        this.XSLTProvider = providerFactory.createXSLTProvider();
 
         this.daoHTML = new ServiceDBDAOHTML(conf);
         this.controllerHTML = new DefaultServiceController(daoHTML,HTMLProvider);
         this.daoXML = new ServiceDBDAOXML(conf);
-        this.controllerXML = new DefaultServiceController(daoXML);
+        this.controllerXML = new DefaultServiceController(daoXML,XMLProvider);
         this.daoXSD = new ServiceDBDAOXSD(conf);
-        this.controllerXSD = new DefaultServiceController(daoXSD);
+        this.controllerXSD = new DefaultServiceController(daoXSD,XSDProvider);
         this.daoXSLT = new ServiceDBDADOXSLT(conf);
-        this.controllerXSLT = new ServiceControllerXslt(daoXSLT);
+        this.controllerXSLT = new ServiceControllerXslt(daoXSLT,XSLTProvider);
 
 
 
@@ -70,22 +76,43 @@ public class HybridServer {
     public HybridServer(Map<String, String> pages) {
         this.threadPool = Executors.newFixedThreadPool(50);
         this.daoHTML = new ServiceMapDAO(pages);
-        this.controllerHTML = new DefaultServiceController(daoHTML);
+        this.providerFactory = new PageProviderFactory(conf);
+        this.HTMLProvider = providerFactory.createHTMLProvider();
+        this.XMLProvider = providerFactory.createXMLProvider();
+        this.XSDProvider = providerFactory.createXSDProvider();
+        this.XSLTProvider = providerFactory.createXSLTProvider();
+
+        this.daoHTML = new ServiceDBDAOHTML(conf);
+        this.controllerHTML = new DefaultServiceController(daoHTML,HTMLProvider);
+        this.daoXML = new ServiceDBDAOXML(conf);
+        this.controllerXML = new DefaultServiceController(daoXML,XMLProvider);
+        this.daoXSD = new ServiceDBDAOXSD(conf);
+        this.controllerXSD = new DefaultServiceController(daoXSD,XSDProvider);
+        this.daoXSLT = new ServiceDBDADOXSLT(conf);
+        this.controllerXSLT = new ServiceControllerXslt(daoXSLT,XSLTProvider);
 
     }
     public HybridServer(Configuration configuration) {
         this.threadPool = Executors.newFixedThreadPool(configuration.getNumClients());
         this.service_port = configuration.getHttpPort();
-        this.daoHTML = new ServiceDBDAOHTML(configuration);
-        this.controllerHTML = new DefaultServiceController(daoHTML);
-        this.daoXML = new ServiceDBDAOXML(configuration);
-        this.controllerXML = new DefaultServiceController(daoXML);
-        this.daoXSD = new ServiceDBDAOXSD(configuration);
-        this.controllerXSD = new DefaultServiceController(daoXSD);
-        this.daoXSLT = new ServiceDBDADOXSLT(configuration);
-        this.controllerXSLT = new ServiceControllerXslt(daoXSLT);
+        this.conf = configuration;
+        this.providerFactory = new PageProviderFactory(conf);
+        this.HTMLProvider = providerFactory.createHTMLProvider();
+        this.XMLProvider = providerFactory.createXMLProvider();
+        this.XSDProvider = providerFactory.createXSDProvider();
+        this.XSLTProvider = providerFactory.createXSLTProvider();
+
+        this.daoHTML = new ServiceDBDAOHTML(conf);
+        this.controllerHTML = new DefaultServiceController(daoHTML,HTMLProvider);
+        this.daoXML = new ServiceDBDAOXML(conf);
+        this.controllerXML = new DefaultServiceController(daoXML,XMLProvider);
+        this.daoXSD = new ServiceDBDAOXSD(conf);
+        this.controllerXSD = new DefaultServiceController(daoXSD,XSDProvider);
+        this.daoXSLT = new ServiceDBDADOXSLT(conf);
+        this.controllerXSLT = new ServiceControllerXslt(daoXSLT,XSLTProvider);
         this.url = configuration.getWebServiceURL();
         this.conf = configuration;
+
 
 
     }
@@ -99,14 +126,20 @@ public class HybridServer {
         this.conf.setDbURL(properties.getProperty("db.url"));
         this.threadPool = Executors.newFixedThreadPool(Integer.parseInt(properties.getProperty("numClients")));
 
+        this.providerFactory = new PageProviderFactory(conf);
+        this.HTMLProvider = providerFactory.createHTMLProvider();
+        this.XMLProvider = providerFactory.createXMLProvider();
+        this.XSDProvider = providerFactory.createXSDProvider();
+        this.XSLTProvider = providerFactory.createXSLTProvider();
+
         this.daoHTML = new ServiceDBDAOHTML(conf);
-        this.controllerHTML = new DefaultServiceController(daoHTML);
+        this.controllerHTML = new DefaultServiceController(daoHTML,HTMLProvider);
         this.daoXML = new ServiceDBDAOXML(conf);
-        this.controllerXML = new DefaultServiceController(daoXML);
+        this.controllerXML = new DefaultServiceController(daoXML,XMLProvider);
         this.daoXSD = new ServiceDBDAOXSD(conf);
-        this.controllerXSD = new DefaultServiceController(daoXSD);
+        this.controllerXSD = new DefaultServiceController(daoXSD,XSDProvider);
         this.daoXSLT = new ServiceDBDADOXSLT(conf);
-        this.controllerXSLT = new ServiceControllerXslt(daoXSLT);
+        this.controllerXSLT = new ServiceControllerXslt(daoXSLT,XSLTProvider);
 
         this.setServicePort(Integer.parseInt(properties.getProperty("port")));
 

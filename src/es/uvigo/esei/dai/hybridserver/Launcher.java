@@ -1,53 +1,30 @@
 package es.uvigo.esei.dai.hybridserver;
 
+import es.uvigo.esei.dai.hybridserver.http.HTTPResponse;
+import es.uvigo.esei.dai.hybridserver.http.HTTPResponseStatus;
+
 import java.io.*;
 
 import java.util.Properties;
 
 public class Launcher {
-    public static void main(String[] args) {
-        HybridServer hybridServer = null;
-        if (args.length != 0) {
-            if (args.length == 1) {
-                try {
-                    Properties props = getPropsFromFile(args[0]);
-                    hybridServer = new HybridServer(props);
-                } catch (Exception e) {
-                    System.err.println(e);
-                    System.exit(0);
-                }
-            } else {
-                System.exit(0);
+    public static void main(String[] args) throws Exception {
+        HybridServer server;
+        HTTPResponse response = new HTTPResponse();
+        if (args.length == 0) {
+            server = new HybridServer();
+            server.start();
+        } else if (args.length == 1) {
+            Configuration conf = new XMLConfigurationLoader().load((new File(args[0])));
+
+            if (conf == null) {
+                System.err.println("en el xml hay un error");
+                response.setStatus(HTTPResponseStatus.S404);
             }
-        } else {
-            hybridServer = new HybridServer();
+            server = new HybridServer(conf);
+
+            server.start();
         }
-
-        hybridServer.start();
-    }
-
-    private static Properties getPropsFromFile(String file) {
-        Properties props = new Properties();
-        InputStream input = null;
-
-        try {
-            input = new FileInputStream(file);
-
-            // Load a properties file
-            props.load(input);
-
-        } catch (IOException ex) {
-            ex.printStackTrace();
-        } finally {
-            if (input != null) {
-                try {
-                    input.close();
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-            }
-        }
-        return props;
     }
 }
 

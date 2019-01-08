@@ -1,15 +1,19 @@
 package es.uvigo.esei.dai.hybridserver.controller;
 
-import es.uvigo.esei.dai.hybridserver.dao.ServiceDAO;
+import es.uvigo.esei.dai.hybridserver.Provider.PageProvider;
+import es.uvigo.esei.dai.hybridserver.Provider.XSLTPageProvider;
+
 import es.uvigo.esei.dai.hybridserver.dao.ServiceDAOForXslt;
 
 import java.util.Set;
 
 public class ServiceControllerXslt implements ServiceControllerForXslt {
     private final ServiceDAOForXslt dao;
+    private final XSLTPageProvider provider;
 
-    public ServiceControllerXslt(ServiceDAOForXslt dao){
+    public ServiceControllerXslt(ServiceDAOForXslt dao, PageProvider provider){
         this.dao = dao;
+        this.provider = (XSLTPageProvider) provider;
     }
 
 
@@ -21,10 +25,21 @@ public class ServiceControllerXslt implements ServiceControllerForXslt {
 
     @Override
     public String getPage(String uuid) {
-        return this.dao.getPage(uuid);
+        String content = this.dao.getPage(uuid);
+        if(content == null){
+            content = provider.getPage(uuid);
+        }
+        return content;
     }
 
-    public String getXSD(String uuid){ return this.dao.getXSD(uuid);}
+    public String getXSD(String uuid){
+       String content = this.dao.getXSD(uuid);
+        if(content == null){
+            content = provider.getXSD(uuid);
+        }
+        return content;
+
+    }
 
     @Override
     public void deletePage(String uuid) {
@@ -33,7 +48,10 @@ public class ServiceControllerXslt implements ServiceControllerForXslt {
 
     @Override
     public Set<String> listPages() {
-        return this.dao.listPages();
+        Set<String> pages = this.dao.listPages();
+        pages.addAll(provider.listPages());
+
+        return pages;
     }
 
 }

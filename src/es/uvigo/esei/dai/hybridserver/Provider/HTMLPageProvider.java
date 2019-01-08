@@ -5,11 +5,11 @@ import es.uvigo.esei.dai.hybridserver.controller.RemoteServers;
 
 import java.util.*;
 
-public class HTMLPageProviderFactory implements PageProvider {
+public class HTMLPageProvider implements PageProvider {
 
     private RemoteServers remote;
 
-    public HTMLPageProviderFactory(RemoteServers remote){
+    public HTMLPageProvider(RemoteServers remote){
         this.remote = remote;
     }
     @Override

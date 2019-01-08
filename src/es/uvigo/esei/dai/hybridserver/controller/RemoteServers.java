@@ -36,6 +36,7 @@ public class RemoteServers {
 
             }catch (MalformedURLException | WebServiceException e){
                 System.out.println("Error con los servicios");
+                System.out.println(e.getMessage());
             }
         }
         return services;

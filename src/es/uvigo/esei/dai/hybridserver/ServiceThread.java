@@ -142,6 +142,7 @@ public class ServiceThread implements Runnable {
                                             break;
                                         default:
                                             response.setContent(contenidoGet);
+
                                             response.setStatus(HTTPResponseStatus.S200);
                                             response.putParameter("Content-Type", MIME.APPLICATION_XML.getMime());
                                             break;
@@ -291,11 +292,7 @@ public class ServiceThread implements Runnable {
                                     case "html":controllerHTML.deletePage(resourceParameter);break;
                                     case "xml":controllerXML.deletePage(resourceParameter);break;
                                     case "xslt":controllerXSLT.deletePage(resourceParameter);break;
-                                    default:controllerXSD.deletePage(resourceParameter);
-
-
-
-                                    break;
+                                    default:controllerXSD.deletePage(resourceParameter); break;
                                 }
 
                                 response.setStatus(HTTPResponseStatus.S200);

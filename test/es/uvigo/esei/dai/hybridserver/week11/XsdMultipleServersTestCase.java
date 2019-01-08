@@ -48,6 +48,7 @@ extends AbstractGetMultipleServersTestCase {
 	public final void testGetRemotes() throws IOException {
 		final String[] uuids = getRemoteXsdUUIDs(this.serverIndex);
 		final String[] contents = getRemoteXsdFiles(this.serverIndex);
+
 		
 		testMultipleGets(uuids, contents);
 	}

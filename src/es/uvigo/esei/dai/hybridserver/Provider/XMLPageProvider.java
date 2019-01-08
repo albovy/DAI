@@ -7,10 +7,10 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Set;
 
-public class XMLPageProviderFactory implements PageProvider {
+public class XMLPageProvider implements PageProvider {
     private RemoteServers remote;
 
-    public XMLPageProviderFactory(RemoteServers remote) {
+    public XMLPageProvider(RemoteServers remote) {
         this.remote = remote;
     }
 

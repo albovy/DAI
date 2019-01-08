@@ -7,10 +7,10 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Set;
 
-public class XSDPageProvider implements PageProvider {
+public class XSLTPageProvider implements PageProvider {
     private RemoteServers remote;
 
-    public XSDPageProvider(RemoteServers remote) {
+    public XSLTPageProvider(RemoteServers remote) {
         this.remote = remote;
     }
 
@@ -18,7 +18,7 @@ public class XSDPageProvider implements PageProvider {
     public String getPage(String uuid) {
         String content=null;
         for (WebService webService : this.remote.remotes().values()) {
-            content = webService.contentXSD(uuid);
+            content = webService.contentXSLT(uuid);
             if (content != null)
                 break;
         }
@@ -30,10 +30,20 @@ public class XSDPageProvider implements PageProvider {
         Set<String> result = new HashSet<>();
         Iterator<String> it;
         for (WebService webService : this.remote.remotes().values()) {
-            it = webService.uuidXSD().iterator();
+            it = webService.uuidXSLT().iterator();
             while (it.hasNext())
                 result.add(it.next());
         }
         return result;
+    }
+
+    public String getXSD(String uuid){
+        String content=null;
+        for (WebService webService : this.remote.remotes().values()) {
+            content = webService.getXSD(uuid);
+            if (content != null)
+                break;
+        }
+        return content;
     }
 }
